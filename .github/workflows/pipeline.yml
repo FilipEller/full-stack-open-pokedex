@@ -12,7 +12,7 @@ on:
       - synchronize
 
 env:
-  SHOULD_DEPLOY: ${{ github.event_name == 'push' || !contains(join(github.event.commits.*.message, ' / '), '#skip') }}
+  SHOULD_DEPLOY: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' / '), '#skip') }}
 
 jobs:
   simple_deployment_pipeline:

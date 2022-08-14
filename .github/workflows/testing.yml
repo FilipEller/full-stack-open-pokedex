@@ -39,4 +39,4 @@ jobs:
       - name: full if condition
         env:
           FULL_IF: ${{ github.event_name == 'push' && !env.SKIP }}
-        echo "$FULL_IF"
+        run: echo "$FULL_IF"

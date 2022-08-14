@@ -11,12 +11,6 @@ on:
       - opened
       - synchronize
 
-env:
-  COMMIT_MESSAGES: ${{ join(github.event.commits.*.message, ' / ') }}
-  CONTAINS_SKIP: ${{ contains(env.JOINED_MESSAGES, '#skip') }}
-  FULL_IF: ${{ github.event_name == 'push' && !env.SKIP }}
-
-
 jobs:
   a_test_job:
     runs-on: ubuntu-20.04
@@ -28,8 +22,16 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
       - name: commit messages
         run: echo "$COMMIT_MESSAGES"
+        env:
+          COMMIT_MESSAGES: ${{ join(github.event.commits.*.message, ' / ') }}
       - name: check for skip
         run: echo "$CONTAINS_SKIP"
-      - name: full if condition
         env:
+          COMMIT_MESSAGES: ${{ join(github.event.commits.*.message, ' / ') }}
+          CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message, ' / '), '#skip') }}
+      - name: full if condition
         run: echo "$FULL_IF"
+        env:
+          COMMIT_MESSAGES: ${{ join(github.event.commits.*.message, ' / ') }}
+          CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message, ' / '), '#skip') }}
+          FULL_IF: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' / '), '#skip') }}

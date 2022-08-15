@@ -17,6 +17,10 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v3
+      - name: github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github.repository) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: set up Node
         uses: actions/setup-node@v2
         with:
@@ -45,6 +49,22 @@ jobs:
           healthcheck: 'https://shielded-woodland-56383.herokuapp.com/health'
           checkstring: 'ok'
           rollbackonhealthcheckfailed: true
+      - name: build failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: failure()
+        with:
+          severity: error
+          text: Build failed
+          description: commit ${{ github.event.head_commit.url }} by ${{ github.event.head_commit.author.username }} broke the build.
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: deployment success
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' / '), '#skip') }}
+        with:
+          severity: info
+          text: A new version of Pokedex deployed
+          description: https://shielded-woodland-56383.herokuapp.com/ by ${{ github.event.head_commit.author.username }}
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   tag_release:
     needs:
       - simple_deployment_pipeline

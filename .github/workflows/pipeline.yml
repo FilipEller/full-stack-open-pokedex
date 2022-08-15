@@ -51,7 +51,7 @@ jobs:
           rollbackonhealthcheckfailed: true
       - name: build failure
         uses: rjstone/discord-webhook-notify@v1
-        if: failure()
+        if: ${{ failure() && github.event_name == 'push' }}
         with:
           severity: error
           text: Build failed
